@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 
@@ -12,9 +13,19 @@ import (
 
 func loadDatabaseOptions(configPath, environment string) map[string]string {
 	filepath := path.Join(configPath, "database.yml")
-	data, _ := ioutil.ReadFile(filepath)
+	_, err := os.Stat(filepath)
+	if os.IsNotExist(err) {
+		log.Fatal("Could not find database config file: " + filepath)
+	}
+	data, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		log.Fatal("Could not read database config file: " + filepath)
+	}
 	var databaseOptions map[string]map[string]string
-	yaml.Unmarshal(data, &databaseOptions)
+	err = yaml.Unmarshal(data, &databaseOptions)
+	if err != nil {
+		log.Fatal("Could not deserialize database config file: " + filepath)
+	}
 	return databaseOptions[environment]
 }
 
