@@ -3,8 +3,6 @@ package database
 import (
 	"os"
 	"testing"
-
-	"github.com/go-pg/pg/orm"
 )
 
 var configFilepath string = "./database.yml"
@@ -15,17 +13,26 @@ type Test struct {
 }
 
 func TestMigration(t *testing.T) {
-	os.Setenv("LEANMS_ENV", "test")
-	CreateDatabase(configFilepath)
+	setup()
 	dbConnection := CreateConnection(configFilepath)
 	defer dbConnection.Close()
-	dbConnection.Database.CreateTable(&Test{}, &orm.CreateTableOptions{
-		Temp: true,
-	})
-	dbConnection.Database.Insert(&Test{Coluna: "123"})
-	count, _ := dbConnection.Database.Model(&Test{ID: 1}).SelectAndCount()
-	if count != 1 {
-		t.Error("Could not setup database")
+	if err := dbConnection.Database.Insert(&Test{Coluna: "123"}); err != nil {
+		t.Errorf("Could not insert into database: %s", err.Error())
 	}
+	count, err := dbConnection.Database.Model(&Test{ID: 1}).SelectAndCount()
+	if err != nil || count != 1 {
+		t.Errorf("Could not setup database. Error was: %s", err.Error())
+	}
+	tearDown()
+}
+
+func setup() {
+	os.Setenv("LEANMS_ENV", "test")
+	DropDatabase(configFilepath)
+	CreateDatabase(configFilepath)
+	CreateTable(configFilepath, &Test{}, nil)
+}
+
+func tearDown() {
 	DropDatabase(configFilepath)
 }
