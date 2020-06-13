@@ -42,6 +42,24 @@ type DbConnection struct {
 	Database *pg.DB
 }
 
+func CreateDatabase(configFilepath string) {
+	environment := os.Getenv("LEANMS_ENV")
+	dbOptions := LoadDatabaseConfig(configFilepath, environment)
+	name := dbOptions.Database
+	dbOptions.Database = ""
+	db := pg.Connect(dbOptions)
+	db.Exec("CREATE DATABASE " + name)
+}
+
+func DropDatabase(configFilepath string) {
+	environment := os.Getenv("LEANMS_ENV")
+	dbOptions := LoadDatabaseConfig(configFilepath, environment)
+	name := dbOptions.Database
+	dbOptions.Database = ""
+	db := pg.Connect(dbOptions)
+	db.Exec("CREATE DATABASE " + name)
+}
+
 // Close closes connection
 func (db DbConnection) Close() {
 	db.Database.Close()
