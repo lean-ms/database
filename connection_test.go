@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-var configFilepath string = "./database.yml"
-
 type Test struct {
 	ID     int64
 	Coluna string

@@ -33,29 +33,13 @@ func DropDatabase(configFilepath string) {
 func CreateTable(configFilepath string, model interface{}, opts *CreateTableOptions) {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.CreateTable(model, getCreateTableOptions(opts))
+	db.CreateTable(model, (*orm.CreateTableOptions)(opts))
 }
 
 func DropTable(configFilepath string, model interface{}, opts *DropTableOptions) {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.DropTable(model, getDropTableOptions(opts))
-}
-
-func getDropTableOptions(opts *DropTableOptions) *orm.DropTableOptions {
-	var options *orm.DropTableOptions
-	if opts != nil {
-		*options = orm.DropTableOptions(*opts)
-	}
-	return options
-}
-
-func getCreateTableOptions(opts *CreateTableOptions) *orm.CreateTableOptions {
-	var options *orm.CreateTableOptions
-	if opts != nil {
-		*options = orm.CreateTableOptions(*opts)
-	}
-	return options
+	db.DropTable(model, (*orm.DropTableOptions)(opts))
 }
 
 func getConnectionWithDefaultOptions(configFilepath string) *pg.DB {
