@@ -6,6 +6,18 @@ import (
 	"github.com/lean-ms/database/config"
 )
 
+type CreateTableOptions struct {
+	Temp          bool
+	IfNotExists   bool
+	Varchar       int
+	FKConstraints bool
+}
+
+type DropTableOptions struct {
+	IfExists bool
+	Cascade  bool
+}
+
 func CreateDatabase(configFilepath string) {
 	databaseName, db := getConnectionWithoutDatabase(configFilepath)
 	defer db.Close()
@@ -18,16 +30,18 @@ func DropDatabase(configFilepath string) {
 	db.Exec("DROP DATABASE " + databaseName)
 }
 
-func CreateTable(configFilepath string, model interface{}, options *orm.CreateTableOptions) {
+func CreateTable(configFilepath string, model interface{}, opts *CreateTableOptions) {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.CreateTable(model, options)
+	options := orm.CreateTableOptions(*opts)
+	db.CreateTable(model, &options)
 }
 
-func DropTable(configFilepath string, model interface{}, options *orm.DropTableOptions) {
+func DropTable(configFilepath string, model interface{}, opts *DropTableOptions) {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.DropTable(model, options)
+	options := orm.DropTableOptions(*opts)
+	db.DropTable(model, &options)
 }
 
 func getConnectionWithDefaultOptions(configFilepath string) *pg.DB {
