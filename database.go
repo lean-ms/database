@@ -4,28 +4,8 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/lean-ms/database/config"
+	"github.com/lean-ms/database/models"
 )
-
-type DbConnection struct {
-	Database *pg.DB
-}
-
-// Close closes connection
-func (db DbConnection) Close() error {
-	return db.Database.Close()
-}
-
-type CreateTableOptions struct {
-	Temp          bool
-	IfNotExists   bool
-	Varchar       int
-	FKConstraints bool
-}
-
-type DropTableOptions struct {
-	IfExists bool
-	Cascade  bool
-}
 
 // CreateDatabase exposes method to create database
 // based on yaml database config file
@@ -43,13 +23,13 @@ func DropDatabase(configFilepath string) error {
 	return err
 }
 
-func CreateTable(configFilepath string, model interface{}, opts *CreateTableOptions) error {
+func CreateTable(configFilepath string, model interface{}, opts *models.CreateTableOptions) error {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
 	return db.CreateTable(model, (*orm.CreateTableOptions)(opts))
 }
 
-func DropTable(configFilepath string, model interface{}, opts *DropTableOptions) error {
+func DropTable(configFilepath string, model interface{}, opts *models.DropTableOptions) error {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
 	return db.DropTable(model, (*orm.DropTableOptions)(opts))
@@ -69,8 +49,8 @@ func getConnectionWithoutDatabase(configFilepath string) (string, *pg.DB) {
 }
 
 // CreateConnection opens connection with a given yml in configFilepath dir
-func CreateConnection(configFilepath string) *DbConnection {
+func CreateConnection(configFilepath string) *models.DbConnection {
 	dbOptions := config.LoadDatabaseConfig(configFilepath)
 	db := pg.Connect(dbOptions)
-	return &DbConnection{Database: db}
+	return &models.DbConnection{Database: db}
 }
