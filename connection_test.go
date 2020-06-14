@@ -17,8 +17,9 @@ func TestMigration(t *testing.T) {
 	if err := dbConnection.Database.Insert(&Test{Coluna: "123"}); err != nil {
 		t.Errorf("Could not insert into database: %s", err.Error())
 	}
-	count, err := dbConnection.Database.Model(&Test{ID: 1}).SelectAndCount()
-	if err != nil || count != 1 {
+	testModel := &Test{ID: 1}
+	err := dbConnection.Database.Select(testModel)
+	if err != nil || testModel.Coluna != "123" {
 		t.Errorf("Could not setup database. Error was: %s", err.Error())
 	}
 	tearDown()
