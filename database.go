@@ -27,6 +27,8 @@ type DropTableOptions struct {
 	Cascade  bool
 }
 
+// CreateDatabase exposes method to create database
+// based on yaml database config file
 func CreateDatabase(configFilepath string) error {
 	databaseName, db := getConnectionWithoutDatabase(configFilepath)
 	defer db.Close()
