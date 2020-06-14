@@ -18,28 +18,30 @@ type DropTableOptions struct {
 	Cascade  bool
 }
 
-func CreateDatabase(configFilepath string) {
+func CreateDatabase(configFilepath string) error {
 	databaseName, db := getConnectionWithoutDatabase(configFilepath)
 	defer db.Close()
-	db.Exec("CREATE DATABASE " + databaseName)
+	_, err := db.Exec("CREATE DATABASE " + databaseName)
+	return err
 }
 
-func DropDatabase(configFilepath string) {
+func DropDatabase(configFilepath string) error {
 	databaseName, db := getConnectionWithoutDatabase(configFilepath)
 	defer db.Close()
-	db.Exec("DROP DATABASE " + databaseName)
+	_, err := db.Exec("DROP DATABASE " + databaseName)
+	return err
 }
 
-func CreateTable(configFilepath string, model interface{}, opts *CreateTableOptions) {
+func CreateTable(configFilepath string, model interface{}, opts *CreateTableOptions) error {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.CreateTable(model, (*orm.CreateTableOptions)(opts))
+	return db.CreateTable(model, (*orm.CreateTableOptions)(opts))
 }
 
-func DropTable(configFilepath string, model interface{}, opts *DropTableOptions) {
+func DropTable(configFilepath string, model interface{}, opts *DropTableOptions) error {
 	db := getConnectionWithDefaultOptions(configFilepath)
 	defer db.Close()
-	db.DropTable(model, (*orm.DropTableOptions)(opts))
+	return db.DropTable(model, (*orm.DropTableOptions)(opts))
 }
 
 func getConnectionWithDefaultOptions(configFilepath string) *pg.DB {
